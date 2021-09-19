@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES6",
+        "jsx": "preserve",
+        "outDir": "./build/",
+        "strictFunctionTypes": true,
+        "sourceMap": true,
+        "strictNullChecks": true,
+    },
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*",
+        "example",
+        "build"
+    ],
+}
