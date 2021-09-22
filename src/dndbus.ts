@@ -2,7 +2,6 @@
 // TODO insert before current element if in first half of the element
 // TODO preview insert location
 // TODO should _stop() before calling move() to prevent user confusion when the elementw as already dropped (but will still follow the cursor till .move() returns)
-// TODO drag_helper height/width includes padding, so it is added twice
 
 // NOTE works only on horizontal stacks (not with multiple elements at the same height)
 
@@ -254,8 +253,9 @@ class DnDBus {
         drag_helper.style.top = '99999px';
         drag_helper.style.left = '99999px';
         drag_helper.style.pointerEvents = 'none';
-        drag_helper.style.width = dom_node.clientWidth + 'px';
-        drag_helper.style.height = dom_node.clientHeight + 'px';
+        const node_style = getComputedStyle(dom_node);
+        drag_helper.style.width = parseFloat(node_style.width) - parseFloat(node_style.paddingLeft) - parseFloat(node_style.paddingRight) + 'px';
+        drag_helper.style.height = parseFloat(node_style.height) - parseFloat(node_style.paddingTop) - parseFloat(node_style.paddingBottom) + 'px';
         container_node.appendChild(drag_helper)
 
         this.context = new _DnDContext(dom_node, drag_helper, container_node, src_container, src_idx);
