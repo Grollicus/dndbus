@@ -209,14 +209,14 @@ class DnDBus {
 
         if(!this.context.can_drop)
             return this._cancel();
-        if(!this.context.hovered_container || !this.context.hovered_idx)
+        if(!this.context.hovered_container || this.context.hovered_idx === null)
             return this._cancel();
 
-        let move_callback = this.move ?? ((_element_node: HTMLElement, _src: object, _src_idx: number, _dst: object, _dst_idx: number) => Promise.resolve());
+        const move_callback = this.move ?? ((_element_node: HTMLElement, _src: object, _src_idx: number, _dst: object, _dst_idx: number) => Promise.resolve());
         Promise.resolve(move_callback(this.context.src_node, this.context.src_container, this.context.src_idx, this.context.hovered_container, this.context.hovered_idx)).then(() => {
             this._stop();
         }, function(error) {
-            console.warn('Cancelled drop due to exception in predrop handler', error);
+            console.warn('Cancelled drop due to exception in move handler', error);
             this._cancel();
         })
     }
