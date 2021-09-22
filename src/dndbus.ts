@@ -82,15 +82,23 @@ class DnDBus {
 
     _lookup_element_for_node(dom_node: HTMLElement): HTMLElement | null {
         let current_node : HTMLElement | null = dom_node;
-        while(current_node !== null && !current_node.classList.contains(this.element_class) && !current_node.classList.contains(this.container_class)) {
+        while(current_node !== null && current_node.classList && !current_node.classList.contains(this.element_class) && !current_node.classList.contains(this.container_class)) {
             current_node = current_node.parentElement;
+        }
+         // for example HTMLDocument - happens in firefox when dragging out of the browser window
+        if(current_node && !current_node.classList) {
+            return null;
         }
         return current_node;
     }
     _lookup_container_for_element(element_node: HTMLElement) : HTMLElement | null {
         let current_node : HTMLElement | null = element_node;
-        while(current_node !== null && !current_node.classList.contains(this.container_class)) {
+        while(current_node !== null && current_node.classList && !current_node.classList.contains(this.container_class)) {
             current_node = current_node.parentElement;
+        }
+         // for example HTMLDocument - happens in firefox when dragging out of the browser window
+         if(current_node && !current_node.classList) {
+            return null;
         }
         return current_node;
     }
