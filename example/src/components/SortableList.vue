@@ -1,6 +1,6 @@
 <template>
   <ul class="container">
-    <li v-for="el, idx in lst" ref="elements" :key="el" class="element"  @mousedown.prevent.stop="on_mousedown(idx)">{{el}}</li>
+    <li v-for="el, idx in lst" ref="elements" :key="el" class="element"  @mousedown.prevent.stop="on_mousedown($event, idx)">{{el}}</li>
   </ul>
 </template>
 
@@ -21,8 +21,8 @@ export default {
     bus.unregister_container(this.$el, this);
   },
   methods: {
-    on_mousedown(idx) {
-      bus.start_drag(this.$refs.elements[idx], idx);
+    on_mousedown(evt, idx) {
+      bus.start_drag(evt, this.$refs.elements[idx], idx);
     }
   }
 }
