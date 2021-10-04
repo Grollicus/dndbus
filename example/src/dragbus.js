@@ -2,11 +2,7 @@
 
 import Dndbus from "../../build/dndbus.js"
 
-function length_callback(container) {
-    return container.lst.length;
-}
-
-let bus = new Dndbus('container', 'element', length_callback, {
+let bus = new Dndbus('container', 'element', {
         move(element_node, src, src_idx, dst, dst_idx) {
             console.log('move', src.lst, src_idx, dst.lst, dst_idx);
             const to_move = src.lst.splice(src_idx, 1)[0];

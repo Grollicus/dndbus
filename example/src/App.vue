@@ -15,8 +15,8 @@ export default Vue.extend({
     SortableList
   },
   data() { return {
-    list1: ['asdf', 'bsdf'],
-    list2: ['foo', 'bar'],
+    list1: ['asdf', 'bsdf', 'csdf'],
+    list2: ['foo', 'bar', 'baz'],
   }}
 });
 </script>

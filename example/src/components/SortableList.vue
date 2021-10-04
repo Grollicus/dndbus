@@ -40,7 +40,4 @@ export default {
   background-color: greenyellow;
   padding-bottom: 30px;
 }
-.hovered {
-  background-color: red;
-}
 </style>
