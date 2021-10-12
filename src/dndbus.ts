@@ -11,6 +11,8 @@ class _DnDContext {
     src_container: object
     src_container_node: HTMLElement
     src_idx: number
+    offset_x: number
+    offset_y: number
     hovered_target: HTMLElement | null
     hovered_next_element: HTMLElement | null
     hovered_container_node: HTMLElement | null
@@ -18,7 +20,7 @@ class _DnDContext {
     hovered_idx:  number | null
     can_drop: boolean
 
-    constructor(src_node: HTMLElement, drag_helper: HTMLElement, src_container_node: HTMLElement, src_container: object, src_idx: number) {
+    constructor(src_node: HTMLElement, drag_helper: HTMLElement, src_container_node: HTMLElement, src_container: object, src_idx: number, offset_x: number, offset_y: number) {
         this.src_node = src_node
         this.drag_helper = drag_helper
         this.drag_helper_on_mouse = false;
@@ -31,6 +33,8 @@ class _DnDContext {
         this.hovered_idx = src_idx;
         this.hovered_container_node = src_container_node;
         this.hovered_container = src_container;
+        this.offset_x = offset_x;
+        this.offset_y = offset_y;
     }
 }
 
@@ -131,8 +135,8 @@ class DnDBus {
             return;
 
         this.context.drag_helper.style.position = 'absolute';
-        this.context.drag_helper.style.top = evt.clientY + 'px';
-        this.context.drag_helper.style.left = evt.clientX + 'px';
+        this.context.drag_helper.style.top = (evt.clientY + this.context.offset_y) + 'px';
+        this.context.drag_helper.style.left = (evt.clientX + this.context.offset_x) + 'px';
         this.context.drag_helper_on_mouse = true;
     }
     _move_draghelper_into_container(container_node: HTMLElement, next_element_node: HTMLElement | null) {
@@ -165,8 +169,8 @@ class DnDBus {
         evt.stopPropagation();
 
         if(this.context.drag_helper_on_mouse) {
-            this.context.drag_helper.style.top = evt.clientY + 'px';
-            this.context.drag_helper.style.left = evt.clientX + 'px';
+            this.context.drag_helper.style.top = (evt.clientY + this.context.offset_y) + 'px';
+            this.context.drag_helper.style.left = (evt.clientX + this.context.offset_x) + 'px';
         }
 
         if(evt.target == this.context.hovered_target)
@@ -347,7 +351,11 @@ class DnDBus {
         drag_helper.style.height = parseFloat(node_style.height) + 'px' // - parseFloat(node_style.paddingTop) - parseFloat(node_style.paddingBottom) + 'px';
         container_node.appendChild(drag_helper)
 
-        this.context = new _DnDContext(dom_node, drag_helper, container_node, src_container, src_idx);
+        const node_bounds = dom_node.getBoundingClientRect();
+        let offset_x = node_bounds.x - evt.clientX;
+        let offset_y = node_bounds.y - evt.clientY;
+
+        this.context = new _DnDContext(dom_node, drag_helper, container_node, src_container, src_idx, offset_x, offset_y);
         this._move_draghelper_to_mouse(evt)
 
         window.addEventListener('mouseup', this._on_mouseup);
