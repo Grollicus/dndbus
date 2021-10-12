@@ -7,6 +7,7 @@ Library to faciliate drag & drop between Components in a web site, for example b
 * Insertion Preview
 * `candrop(el, src, src_idx, dst, dst_idx)` if the user can only drop following custom rules, these rules can be implemented here
 * Does not modify any lists itself to play nice with state maneged by a UI library like Vue.
+* Support for recursive structures
 
 ### Limitations
 * Horizontal stack only - multiple elements in the same container on the same height will confuse the library

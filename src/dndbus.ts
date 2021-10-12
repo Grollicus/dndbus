@@ -86,15 +86,30 @@ class DnDBus {
     }
 
     _lookup_element_for_node(dom_node: HTMLElement): HTMLElement | null {
+        if(!this.context)
+            return null;
+
         let current_node : HTMLElement | null = dom_node;
-        while(current_node !== null && current_node.classList && !current_node.classList.contains(this.element_class) && !current_node.classList.contains(this.container_class)) {
+
+        let element_candidate: HTMLElement | null = null;
+        let container_candidate : HTMLElement | null = null;
+        while(current_node && current_node.classList) {
+            if (current_node === this.context.src_node) { // skip nodes inside the current source to prevent drgging INTO the src element on recursive structures
+                return current_node;
+            }
+            if (!element_candidate && current_node.classList.contains(this.element_class)) {
+                element_candidate = current_node;
+            }
+            if (!container_candidate && current_node.classList.contains(this.container_class)) {
+                container_candidate = current_node;
+            }
             current_node = current_node.parentElement;
         }
          // for example HTMLDocument - happens in firefox when dragging out of the browser window
         if(current_node && !current_node.classList) {
             return null;
         }
-        return current_node;
+        return element_candidate || container_candidate;
     }
     _lookup_container_for_element(element_node: HTMLElement) : HTMLElement | null {
         let current_node : HTMLElement | null = element_node;
