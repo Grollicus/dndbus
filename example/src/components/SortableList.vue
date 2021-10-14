@@ -40,4 +40,10 @@ export default {
   background-color: greenyellow;
   padding-bottom: 30px;
 }
+.preview {
+  background-color: #4444ff;
+}
+.hover {
+  background-color: #aaaaff;
+}
 </style>

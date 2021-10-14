@@ -7,7 +7,9 @@ let bus = new Dndbus('container', 'element', {
             console.log('move', src.lst, src_idx, dst.lst, dst_idx);
             const to_move = src.lst.splice(src_idx, 1)[0];
             dst.lst.splice(dst_idx, 0, to_move);
-        }
+        },
+        hover_class: 'hover',
+        preview_class: 'preview',
 });
 
 export default bus;

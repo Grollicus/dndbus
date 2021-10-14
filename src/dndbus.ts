@@ -52,7 +52,10 @@ class DnDBus {
     cancelled: cancelled_t
     move: move_t
 
-    /**
+    preview_class: string | null
+    hover_class: string | null
+
+    /**!
      * Creates new Drag'n'Drop Bus
      * @param container_class CSS class of containers that contain draggable elements
      * @param element_class CSS class of the draggable elements
@@ -60,21 +63,27 @@ class DnDBus {
      * @param callbacks.candrop durring drag operations, if the source element can be dropped in `dst` at `dst_idx`
      * @param callbacks.cancelled called after cancelling a drag operation, for example for redraws
      * @param callbacks.move called after a dragged element is dropped. Should do the actual move. Can be async.
+     * @param callbacks.preview_class class added to the preview element when a insert position is previewed
+     * @param callbacks.hover_class class added to the preview element when it is following the mouse cursor (that is, can't be dropped at the current location)
      */
-    constructor(container_class: string, element_class: string, {candrop, cancelled, move}: {
+    constructor(container_class: string, element_class: string, {candrop, cancelled, move, preview_class, hover_class}: {
                 candrop: null | ((element_node: HTMLElement, src: object, src_idx: number, dst: object, dst_idx: number) => boolean),
                 cancelled: null | ((element_node: HTMLElement, src: object, src_idx: number) => void),
-                move: null | ((element_node: HTMLElement, src: object, src_idx: number, dst: object, dst_idx: number) => void) | ((element_node: HTMLElement, src: object, src_idx: number, dst: object, dst_idx: number) => Promise<void>)
+                move: null | ((element_node: HTMLElement, src: object, src_idx: number, dst: object, dst_idx: number) => void) | ((element_node: HTMLElement, src: object, src_idx: number, dst: object, dst_idx: number) => Promise<void>),
+                preview_class: undefined | string,
+                hover_class: undefined | string,
     }) {
         this.container_class = container_class
         this.element_class = element_class
         this.containers = new Map();
         this.context = null;
 
-
         this.candrop = candrop ?? null;
         this.cancelled = cancelled ?? null
         this.move = move ?? null;
+
+        this.preview_class = preview_class ?? null;
+        this.hover_class = hover_class ?? null;
 
         this._on_mouseup = this._on_mouseup.bind(this);
         this._on_mousemove = this._on_mousemove.bind(this);
@@ -134,23 +143,34 @@ class DnDBus {
         if(!this.context || this.context.drag_helper_on_mouse)
             return;
 
-        this.context.drag_helper.style.position = 'fixed';
-        this.context.drag_helper.style.top = (evt.clientY + this.context.offset_y) + 'px';
-        this.context.drag_helper.style.left = (evt.clientX + this.context.offset_x) + 'px';
+        const drag_helper = this.context.drag_helper;
+
+        drag_helper.style.position = 'fixed';
+        drag_helper.style.top = (evt.clientY + this.context.offset_y) + 'px';
+        drag_helper.style.left = (evt.clientX + this.context.offset_x) + 'px';
+        if (this.preview_class)
+            drag_helper.classList.remove(this.preview_class);
+        if (this.hover_class)
+            drag_helper.classList.add(this.hover_class);
         this.context.drag_helper_on_mouse = true;
     }
     _move_draghelper_into_container(container_node: HTMLElement, next_element_node: HTMLElement | null) {
         if(!this.context)
             return;
 
-        this.context.drag_helper.style.position = 'unset';
-        this.context.drag_helper.style.top = 'unset';
-        this.context.drag_helper.style.left = 'unset';
+        let drag_helper = this.context.drag_helper;
+        drag_helper.style.position = 'unset';
+        drag_helper.style.top = 'unset';
+        drag_helper.style.left = 'unset';
         if(next_element_node) {
-            container_node.insertBefore(this.context.drag_helper, next_element_node)
+            container_node.insertBefore(drag_helper, next_element_node)
         } else {
-            container_node.appendChild(this.context.drag_helper);
+            container_node.appendChild(drag_helper);
         }
+        if (this.hover_class)
+            drag_helper.classList.remove(this.hover_class);
+        if (this.preview_class)
+            drag_helper.classList.add(this.preview_class);
         this.context.drag_helper_on_mouse = false;
     }
 
@@ -345,7 +365,6 @@ class DnDBus {
         // TODO tgr drag_helper zindex
         let drag_helper = dom_node.cloneNode(true) as HTMLElement;
         drag_helper.style.pointerEvents = 'none';
-        drag_helper.style.opacity = '0.5';
         const node_style = getComputedStyle(dom_node);
         drag_helper.style.width = parseFloat(node_style.width) + 'px' // - parseFloat(node_style.paddingLeft) - parseFloat(node_style.paddingRight) + 'px';
         drag_helper.style.height = parseFloat(node_style.height) + 'px' // - parseFloat(node_style.paddingTop) - parseFloat(node_style.paddingBottom) + 'px';
