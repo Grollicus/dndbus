@@ -104,17 +104,13 @@ class DnDBus {
 
         let current_node : HTMLElement | null = dom_node;
 
-        let element_candidate: HTMLElement | null = null;
-        let container_candidate : HTMLElement | null = null;
+        let candidate : HTMLElement | null = null;
         while(current_node && current_node.classList) {
             if (current_node === this.context.src_node) { // skip nodes inside the current source to prevent drgging INTO the src element on recursive structures
                 return current_node;
             }
-            if (!element_candidate && current_node.classList.contains(this.element_class)) {
-                element_candidate = current_node;
-            }
-            if (!container_candidate && current_node.classList.contains(this.container_class)) {
-                container_candidate = current_node;
+            if (!candidate && (current_node.classList.contains(this.element_class) || current_node.classList.contains(this.container_class))) {
+                candidate = current_node;
             }
             current_node = current_node.parentElement;
         }
@@ -122,7 +118,7 @@ class DnDBus {
         if(current_node && !current_node.classList) {
             return null;
         }
-        return element_candidate || container_candidate;
+        return candidate;
     }
     _lookup_container_for_element(element_node: HTMLElement) : HTMLElement | null {
         let current_node : HTMLElement | null = element_node;
