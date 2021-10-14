@@ -134,7 +134,7 @@ class DnDBus {
         if(!this.context || this.context.drag_helper_on_mouse)
             return;
 
-        this.context.drag_helper.style.position = 'absolute';
+        this.context.drag_helper.style.position = 'fixed';
         this.context.drag_helper.style.top = (evt.clientY + this.context.offset_y) + 'px';
         this.context.drag_helper.style.left = (evt.clientX + this.context.offset_x) + 'px';
         this.context.drag_helper_on_mouse = true;
