@@ -1,6 +1,7 @@
 // TODO change cursor to grab cursor
 // TODO insert before current element if in first half of the element (NOTE: keep some dead zone in the middle that does not change the current choice)
 // TODO should _stop() before calling move() to prevent user confusion when the elementw as already dropped (but will still follow the cursor till .move() returns)
+// TODO moving back in the same element results in a wrong offset when splice()ing
 
 // NOTE works only on horizontal stacks (not with multiple elements at the same height)
 
@@ -252,19 +253,42 @@ class DnDBus {
 
         if(!hovered_element && hovered_container_node) {
             let i = 0;
-            let found = false;
+            let horizontal_candidates: Array<HTMLElement> = [];
+            let next_element: HTMLElement | null = null;
             for(const element of this._list_container_elements_in_order(hovered_container_node)) {
                 if(element == this.context.drag_helper)
                     continue;
 
-                const rect = element.getBoundingClientRect()
+                const rect = element.getBoundingClientRect();
+                if(rect.y <= evt.clientY && rect.bottom > evt.clientY) {
+                    horizontal_candidates.push(element);
+                    i += 1;
+                    continue;
+                }
+
                 if(rect.y > evt.clientY) {
-                    this.context.hovered_next_element = element;
-                    found = true
+                    next_element = element;
                     break;
                 }
                 i += 1;
             }
+
+            i -= horizontal_candidates.length;
+            let found = false;
+            for(const candidate of horizontal_candidates) {
+                const rect = candidate.getBoundingClientRect();
+                if(rect.x > evt.clientX) {
+                    this.context.hovered_next_element = candidate;
+                    found = true;
+                    break;
+                }
+                i += 1;
+            }
+            if(next_element && !found) {
+                this.context.hovered_next_element = next_element;
+                found = true;
+            }
+
             if(!found) {
                 this.context.hovered_next_element = null;
             }
